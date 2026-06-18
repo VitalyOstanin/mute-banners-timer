@@ -1,4 +1,4 @@
-# 0005 - "Show now" ends the mute and releases the burst
+# 0005 - "Unmute now" ends the mute and releases the burst
 
 Status: Accepted
 
@@ -10,7 +10,7 @@ muting without showing the missed banners.
 
 ## Decision
 
-Provide a single early action, "Show now", that ends the mute and immediately
+Provide a single early action, "Unmute now", that ends the mute and immediately
 releases the accumulated burst — identical to natural timer expiry, only earlier.
 No separate "stop without releasing" action.
 

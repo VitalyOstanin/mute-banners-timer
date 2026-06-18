@@ -161,7 +161,7 @@ helper, with no Node toolchain and no GNOME platform mocking.
 3. From the indicator pick "1 min"; `notify-send` normal and critical — neither
    pops up.
 4. Open/close the notification list during the mute — the block is kept.
-5. Confirm the countdown and "Show now"; confirm the release burst.
+5. Confirm the countdown and "Unmute now"; confirm the release burst.
 6. With a banner on screen, change the duration in its dropdown (confirm it does
    NOT start muting and persists across a relog) and then click Mute (confirm the
    banner closes immediately).

@@ -13,3 +13,12 @@
 .mbt-mute {
     font-weight: bold;
 }
+
+/* Panel indicator: same bell glyph, recoloured by state (Adwaita palette). */
+.mbt-icon-idle {
+    color: #2ec27e;
+}
+
+.mbt-icon-muted {
+    color: #e01b24;
+}

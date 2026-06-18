@@ -21,7 +21,7 @@ accumulate in GNOME's queue and pop up as a burst when the timer ends.
   minutes: 1, 2, 3, 5, 10, 15, 20, 30, 60.
 - During the mute window no banner pops up; notifications still go to the
   notification list (the calendar drop-down).
-- When the window ends — by timer or early via "Show now" — the accumulated
+- When the window ends — by timer or early via "Unmute now" — the accumulated
   notifications pop up as a burst.
 
 ## How to use
@@ -34,8 +34,9 @@ accumulate in GNOME's queue and pop up as a burst when the timer ends.
   start muting straight away.
 - The chosen duration persists across GNOME sessions (GSettings), so the dropdown
   and the indicator menu reopen on the value you used last.
-- While muting, the panel indicator shows the remaining time and a "Show now"
+- While muting, the panel indicator shows the remaining time and a "Unmute now"
   action that ends the mute and releases the burst immediately.
+- The indicator is a bell, green when idle and red while muting.
 
 ## Why it also mutes critical
 
@@ -85,7 +86,7 @@ gnome-extensions enable mute-banners-timer@VitalyOstanin
   release burst rather than being lost.
 - The `bannerBlocked` guard keeps the block while `panel.js` toggles
   `bannerBlocked` on opening/closing the notification list.
-- Ending the mute (timer or "Show now") clears the block and lets GNOME flush the
+- Ending the mute (timer or "Unmute now") clears the block and lets GNOME flush the
   queue.
 
 ## Limitations
@@ -93,7 +94,7 @@ gnome-extensions enable mute-banners-timer@VitalyOstanin
 - The release burst uses GNOME's queue, which holds at most 3 non-critical
   notifications (plus all critical). Older non-critical notifications stay only in
   the notification list.
-- No early cancel without releasing the burst: "Show now" both ends the mute and
+- No early cancel without releasing the burst: "Unmute now" both ends the mute and
   releases the accumulated notifications.
 
 ## License
