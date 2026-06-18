@@ -1,0 +1,15 @@
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+
+/* The on-banner controls reuse the shell's .message-media-control look but carry
+ * text rather than an icon, so they need horizontal padding and an automatic
+ * width instead of the fixed icon-button metrics. */
+.mbt-duration,
+.mbt-mute {
+    min-width: 0;
+    width: auto;
+    padding: 0 8px;
+}
+
+.mbt-mute {
+    font-weight: bold;
+}
