@@ -11,6 +11,8 @@ accumulate in GNOME's queue and pop up as a burst when the timer ends.
 - [Why it also mutes critical](#why-it-also-mutes-critical)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
+- [Development](#development)
+- [Tests](#tests)
 - [How it works](#how-it-works)
 - [Limitations](#limitations)
 - [License](#license)
@@ -72,6 +74,38 @@ Restart GNOME Shell (X11: `Alt+F2`, `r`, Enter; Wayland: re-login), then:
 ```sh
 gnome-extensions enable mute-banners-timer@VitalyOstanin
 ```
+
+## Development
+
+```sh
+node --check extension.js
+node --check lib/*.js
+glib-compile-schemas schemas/
+```
+
+`node --check` validates ESM syntax without resolving `gi://` imports. The
+upstream GNOME sources are checked out locally for API verification; see
+[CLAUDE.md](CLAUDE.md) for the procedure to verify the extension against new
+GNOME Shell versions.
+
+## Tests
+
+`muteController.js` is pure logic (it imports only `gi://GLib`) and has unit
+tests that run under `gjs` (the GNOME JavaScript interpreter that runs the
+extension):
+
+```sh
+./tests/run.sh
+```
+
+The runner executes every `tests/*.test.js` file and fails the run if any of
+them exits non-zero. The tests cover the suppression mechanism — the
+`bannerBlocked` guard against `panel.js`, the mute/release cycle, the countdown,
+and the triggering-banner requeue — using a fake tray, with no Node toolchain
+and no GNOME platform mocking.
+
+Why `gjs` and not a Node test framework (vitest/jest): see
+[docs/ADR/0007](docs/ADR/0007-test-with-gjs.md).
 
 ## How it works
 
