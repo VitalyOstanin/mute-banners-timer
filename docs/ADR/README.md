@@ -10,3 +10,5 @@
 - [0008 — Persist the chosen duration via GSettings](0008-persist-duration-via-gsettings.md) (superseded by 0009)
 - [0009 — On-banner mute button with a preset dropdown](0009-on-banner-dropdown-and-mute.md)
 - [0010 — Return the triggering banner to the release burst](0010-requeue-triggering-banner.md)
+- [0011 — Indicator state colors as fixed Adwaita literals](0011-indicator-colors-as-fixed-literals.md)
+- [0012 — Ship sources verbatim to e.g.o, no comment stripping](0012-ship-sources-verbatim-for-ego.md)

@@ -36,8 +36,13 @@ guard installed by one test cannot leak into another.
   mocking and no node/npm toolchain.
 - No assertion library, fixtures, watch mode, or coverage reporting — the helper
   is deliberately minimal.
-- The indicator and the `_showNotification` override depend on live GNOME UI
-  objects and are not unit-tested; they are covered by the manual functional run
-  before publishing.
+- Unit coverage is limited to the pure logic in `muteController.js`. The UI
+  modules `indicator.js` and `bannerControl.js`, and the `_showNotification`
+  override, import live-shell resource modules (`resource:///org/gnome/shell/...`)
+  that do not exist outside a running GNOME session, so they cannot run under the
+  same synchronous gjs runner and are not unit-tested. They are covered by the
+  manual functional run before publishing. Pure helpers that creep into a UI
+  module (for example time formatting) should move into `muteController.js` so
+  they fall under unit coverage; the rest stays manual by necessity.
 - Running the tests requires `gjs` on `PATH` (already present wherever GNOME
   Shell runs); `tests/run.sh` reports a clear error if it is missing.
