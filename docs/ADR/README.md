@@ -7,6 +7,6 @@
 - [0005 — "Unmute now" ends the mute and releases the burst](0005-show-now-ends-and-releases.md)
 - [0006 — Support GNOME 45-50](0006-support-gnome-45-to-50.md)
 - [0007 — Run unit tests under gjs](0007-test-with-gjs.md)
-- [0008 — Persist the chosen duration via GSettings](0008-persist-duration-via-gsettings.md)
-- [0009 — On-banner duration dropdown and Mute button](0009-on-banner-dropdown-and-mute.md)
+- [0008 — Persist the chosen duration via GSettings](0008-persist-duration-via-gsettings.md) (superseded by 0009)
+- [0009 — On-banner mute button with a preset dropdown](0009-on-banner-dropdown-and-mute.md)
 - [0010 — Return the triggering banner to the release burst](0010-requeue-triggering-banner.md)

@@ -1,6 +1,15 @@
 # 0008 - Persist the chosen duration via GSettings
 
-Status: Accepted
+Status: Superseded by ADR 0009 (duration no longer persisted)
+
+## Why superseded
+
+The persisted value existed only to pre-select a duration in the on-banner
+dropdown. ADR 0009 replaced that dropdown with a single `mute` button whose menu
+starts the mute on selection, and the panel menu lists all presets directly.
+Nothing reads `last-duration` any more, so the key, its schema, the
+`settings-schema` entry in `metadata.json`, and the `getSettings()` call were
+removed. The original decision is kept below for the record.
 
 ## Context
 

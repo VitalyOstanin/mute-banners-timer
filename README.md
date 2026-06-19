@@ -28,14 +28,11 @@ accumulate in GNOME's queue and pop up as a burst when the timer ends.
 
 ## How to use
 
-- Reactively, from an ill-timed banner: its header carries a duration dropdown
-  (showing the last chosen duration) and a **Mute** button. Pick a preset in the
-  dropdown to change the duration, then click **Mute** to silence banners for that
-  duration. The banner closes and rejoins the release burst.
+- Reactively, from an ill-timed banner: a **mute** button sits under the banner
+  text. Click it to open a duration menu; picking a preset starts the mute for
+  that duration right away. The banner closes and rejoins the release burst.
 - Proactively, from the panel indicator: open its menu and pick a duration to
   start muting straight away.
-- The chosen duration persists across GNOME sessions (GSettings), so the dropdown
-  and the indicator menu reopen on the value you used last.
 - While muting, the panel indicator shows the remaining time and a "Unmute now"
   action that ends the mute and releases the burst immediately.
 - The indicator is a bell, green when idle and red while muting.
@@ -53,9 +50,9 @@ on-banner control all work across these versions.
 
 The extension does not patch the bodies of GNOME methods; it redefines the
 `bannerBlocked` setter accessor and decorates each banner after GNOME creates it.
-The on-banner controls are still feature-detected (they are added only if the
-banner exposes the `_mediaControls` row), so a future shell that changes the
-banner structure degrades to the panel indicator instead of breaking.
+The on-banner button is still feature-detected (it is added only if the banner
+exposes its content column), so a future shell that changes the banner structure
+degrades to the panel indicator instead of breaking.
 
 ## Installation
 
@@ -65,8 +62,6 @@ banner structure degrades to the panel indicator instead of breaking.
 git clone https://github.com/VitalyOstanin/mute-banners-timer.git
 ln -s "$(pwd)/mute-banners-timer" \
   ~/.local/share/gnome-shell/extensions/mute-banners-timer@VitalyOstanin
-# Compile the GSettings schema for the symlinked install:
-glib-compile-schemas "$(pwd)/mute-banners-timer/schemas/"
 ```
 
 Restart GNOME Shell (X11: `Alt+F2`, `r`, Enter; Wayland: re-login), then:
@@ -80,7 +75,6 @@ gnome-extensions enable mute-banners-timer@VitalyOstanin
 ```sh
 node --check extension.js
 node --check lib/*.js
-glib-compile-schemas schemas/
 ```
 
 `node --check` validates ESM syntax without resolving `gi://` imports. The
@@ -112,12 +106,12 @@ Why `gjs` and not a Node test framework (vitest/jest): see
 - `enable()` locates `Main.messageTray`, installs the mute controller (which
   redefines the `bannerBlocked` setter on the `MessageTray` prototype), and adds
   a panel indicator. It also overrides `_showNotification` to add the on-banner
-  controls (a duration dropdown and a Mute button) to each banner.
+  **mute** button (with its preset menu) to each banner.
 - Engaging mute sets the tray's block and starts a GLib timer. GNOME's queue
   accumulates the missed notifications.
-- When mute is started from a banner's Mute button, that banner is detached back
-  into the queue (without destroying its notification) so it returns in the
-  release burst rather than being lost.
+- When mute is started from a banner's button, that banner is detached back into
+  the queue (without destroying its notification) so it returns in the release
+  burst rather than being lost.
 - The `bannerBlocked` guard keeps the block while `panel.js` toggles
   `bannerBlocked` on opening/closing the notification list.
 - Ending the mute (timer or "Unmute now") clears the block and lets GNOME flush the

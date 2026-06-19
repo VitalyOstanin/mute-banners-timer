@@ -36,30 +36,32 @@ assume it exists because it works on the installed version.
 
 | Symbol                                              | Source      | Versions | Notes                                              |
 | --------------------------------------------------- | ----------- | -------- | -------------------------------------------------- |
-| `Extension`, `InjectionManager`, `getSettings()`    | gnome-shell | 45-50    | `js/extensions/extension.js`; GSettings access     |
+| `Extension`, `InjectionManager`                     | gnome-shell | 45-50    | `js/extensions/extension.js`; lifecycle + override |
 | `Main.messageTray`, `Main.panel.addToStatusArea`    | gnome-shell | 45-50    | singletons, `js/ui/main.js`                        |
-| `Main.uiGroup`                                       | gnome-shell | 45-50    | host for the floating banner dropdown menu         |
+| `Main.uiGroup`                                       | gnome-shell | 45-50    | host for the floating banner preset menu           |
 | `MessageTray.prototype` `bannerBlocked` accessor    | gnome-shell | 45-50    | setter redefined to guard the block                |
 | `MessageTray._bannerBlocked` / `_updateState`       | gnome-shell | 45-50    | private block field and state machine entry        |
 | `MessageTray._notification` / `_notificationQueue`  | gnome-shell | 45-50    | current banner + queue; used by the requeue path   |
 | `MessageTray._banner` / `_bannerBin`, `_notificationState` | gnome-shell | 45-50 | torn down in the requeue path (`State.HIDDEN`)    |
 | `Notification.acknowledged`                          | gnome-shell | 45-50    | cleared so a requeued notification is not filtered |
-| `Message._mediaControls` (St.BoxLayout)             | gnome-shell | 45-50    | row for custom controls (`js/ui/messageList.js`)   |
-| `MessageTray.prototype._showNotification`           | gnome-shell | 45-50    | overridden to add the banner controls              |
+| `Message._bodyBin` / `_bodyStack`                   | gnome-shell | 45-50    | body widget; its parent is the content column      |
+| `MessageTray.prototype._showNotification`           | gnome-shell | 45-50    | overridden to add the banner button                |
 | `PanelMenu.Button`, `PopupMenu.PopupMenuItem`       | gnome-shell | 45-50    | indicator and menu                                 |
-| `PopupMenu.PopupMenu`, `PopupMenuManager`, `St.Side` | gnome-shell | 45-50   | floating preset menu anchored to the dropdown      |
+| `PopupMenu.PopupMenu`, `PopupMenuManager`, `St.Side` | gnome-shell | 45-50   | floating preset menu anchored to the mute button   |
 | `GLib.timeout_add_seconds`, `get_monotonic_time`    | glib        | 45-50    | mute timer and countdown                           |
 
 The on-screen banner (`MessageTray._banner`) is a `Message` subclass on every
 version (`NotificationBanner -> Calendar.NotificationMessage -> Message` on
-45-49, `MessageList.NotificationMessage -> Message` on 50), so its
-`_mediaControls` row exists throughout; `lib/bannerControl.js` adds two custom
-`St.Button` widgets to it with `add_child` (a `Clutter.Actor` method on all
-versions — gnome-45's own banner code uses the legacy `add_actor` alias). The row
-is feature-detected in `_addBannerControl` as a guard against future
-banner-structure changes. The triggering `Notification` is read from
-`MessageTray._notification` (set on all versions) rather than a banner widget
-field.
+45-49, `MessageList.NotificationMessage -> Message` on 50). `lib/bannerControl.js`
+adds one `mute` `St.Button` to the banner's vertical content column (the
+`message-content` box), reached as the parent of the body widget — `_bodyBin` on
+46-50, `_bodyStack` on 45 — so the button lands under the text rather than in the
+`_mediaControls` row to the right. The button is added with `add_child` (a
+`Clutter.Actor` method on all versions — gnome-45's own banner code uses the
+legacy `add_actor` alias). The content column is feature-detected in
+`BannerControl` as a guard against future banner-structure changes. The
+triggering `Notification` is read from `MessageTray._notification` (set on all
+versions) rather than a banner widget field.
 
 ## Suppression model
 
@@ -79,7 +81,7 @@ Verified against `js/ui/messageTray.js` (gnome-50):
 
 ### Returning the triggering banner to the burst
 
-When mute starts from a banner's Mute button, `MuteController._requeueTriggeringBanner`
+When mute starts from a banner's mute button, `MuteController._requeueTriggeringBanner`
 puts that banner's notification back into the burst. It is version-independent:
 
 - While blocked, `_updateState` early-returns, so the shown banner is only hidden
@@ -101,16 +103,22 @@ puts that banner's notification back into the burst. It is version-independent:
 
 ## Signal handling
 
-The extension connects signals only to objects it creates and owns —
-`PopupMenuItem`s, the dropdown/Mute `St.Button`s, and each banner's `destroy`
-signal (so `BannerControl` tears down its floating menu, which lives in
-`Main.uiGroup` rather than under the banner). The menus destroy their items on
-`removeAll()` / `destroy()`, so handlers are released with their emitters. There
-is no connection to a long-lived object from a short-lived owner, so
-`connectObject`/`disconnectObject` brings no benefit here (same situation as
-`wayland-paste`). The mute mechanism itself uses no signals — it redefines a
-property descriptor, drives GLib timers, and manipulates the tray's notification
-queue directly, all undone in `disable()`/`uninstall()`.
+Signals on objects the extension owns use a plain `.connect()`: `PopupMenuItem`s
+and the mute `St.Button`. Their handlers are released when the owner is destroyed
+(`menu.removeAll()` / `menu.destroy()`; `BannerControl.destroy()` destroys the
+button), the same as `wayland-paste`'s indicator.
+
+The one signal on a foreign object — the banner's `destroy` — follows the
+`connectObject(signal, handler, this)` / `disconnectObject(this)` convention used
+across the other extensions (e.g. `notification-banner` connects a notification
+source's `destroy` the same way). `BannerControl` keys it on itself so
+`destroy()` drops it with a single `this._banner?.disconnectObject(this)`, which
+is a no-op if the banner is already being torn down. The floating menu lives in
+`Main.uiGroup` (not under the banner), so it is destroyed explicitly.
+
+The mute mechanism itself uses no signals — it redefines a property descriptor,
+drives GLib timers, and manipulates the tray's notification queue directly, all
+undone in `disable()`/`uninstall()`.
 
 ## Procedure: verify against a GNOME version
 
@@ -162,9 +170,8 @@ helper, with no Node toolchain and no GNOME platform mocking.
    pops up.
 4. Open/close the notification list during the mute — the block is kept.
 5. Confirm the countdown and "Unmute now"; confirm the release burst.
-6. With a banner on screen, change the duration in its dropdown (confirm it does
-   NOT start muting and persists across a relog) and then click Mute (confirm the
-   banner closes immediately).
+6. With a banner on screen, click its "mute" button (under the text), pick a
+   preset, and confirm the mute starts immediately and the banner closes.
 7. Confirm the muted banner returns in the release burst — test both a
    non-`CRITICAL` and a `CRITICAL` triggering notification, and a transient one.
 8. Disable during an active mute; confirm clean restore and no journal errors.
@@ -173,12 +180,11 @@ helper, with no Node toolchain and no GNOME platform mocking.
 ## Files
 
 - `extension.js` — lifecycle, indicator wiring, `_showNotification` override for
-  the banner controls.
+  the banner button.
 - `lib/muteController.js` — the suppression mechanism (bannerBlocked guard,
   timer, triggering-banner requeue).
 - `lib/indicator.js` — the panel indicator and its menu.
-- `lib/bannerControl.js` — the on-banner duration dropdown and Mute button.
-- `schemas/` — GSettings schema for the persisted `last-duration`.
-- `stylesheet.css` — styling for the on-banner text controls.
+- `lib/bannerControl.js` — the on-banner "mute" button and its preset menu.
+- `stylesheet.css` — styling for the on-banner text button and indicator colours.
 - `tests/` — gjs unit tests for `muteController.js`.
 - `docs/ADR/` — architecture decision records.

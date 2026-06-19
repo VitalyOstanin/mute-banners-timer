@@ -3,7 +3,6 @@
   "name": "Mute Banners Timer",
   "description": "Temporarily mutes all notification banners, including CRITICAL ones, for a chosen number of minutes. Start it reactively from a control on an ill-timed banner, or proactively from a persistent panel indicator. Missed notifications accumulate in GNOME's queue and pop up as a burst when the timer ends or you end it early. Suppression uses MessageTray's own bannerBlocked, guarded against GNOME's panel logic that would otherwise lift it. Works on GNOME 45-50.",
   "shell-version": ["45", "46", "47", "48", "49", "50"],
-  "settings-schema": "org.gnome.shell.extensions.mute-banners-timer",
   "url": "https://github.com/VitalyOstanin/mute-banners-timer",
   "version-name": "1.0"
 }

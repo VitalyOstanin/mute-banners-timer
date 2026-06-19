@@ -4,7 +4,7 @@ Status: Accepted (mechanism pending live validation)
 
 ## Context
 
-When the user starts the mute from a banner's Mute button, that banner should
+When the user starts the mute from a banner's mute button, that banner should
 reappear in the release burst rather than be lost. While blocked, `_updateState`
 early-returns, so the shown banner is only hidden and its notification survives —
 but it stays the tray's `_notification` (state `SHOWN`). On release a

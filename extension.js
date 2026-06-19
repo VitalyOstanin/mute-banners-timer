@@ -24,12 +24,10 @@ export default class MuteBannersTimerExtension extends Extension {
       return;
     }
 
-    this._settings = this.getSettings();
-
     this._controller = new MuteController(tray, () => this._indicator?.sync());
     this._controller.install();
 
-    this._indicator = new MuteIndicator(this._controller, this._settings);
+    this._indicator = new MuteIndicator(this._controller);
     Main.panel.addToStatusArea(INDICATOR_ROLE, this._indicator);
 
     this._bannerControl = null;
@@ -50,7 +48,7 @@ export default class MuteBannersTimerExtension extends Extension {
   }
 
   _addBannerControl(banner, notification) {
-    if (!banner || !banner._mediaControls) return;
+    if (!banner) return;
     if (banner._muteBannersControlAdded) return;
     banner._muteBannersControlAdded = true;
 
@@ -59,7 +57,6 @@ export default class MuteBannersTimerExtension extends Extension {
       banner,
       notification ?? banner.notification ?? null,
       this._controller,
-      this._settings,
     );
   }
 
@@ -77,7 +74,5 @@ export default class MuteBannersTimerExtension extends Extension {
 
     this._controller?.uninstall();
     this._controller = null;
-
-    this._settings = null;
   }
 }
