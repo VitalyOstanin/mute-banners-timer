@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import * as MessageTray from "resource:///org/gnome/shell/ui/messageTray.js";
 import {
   Extension,
   InjectionManager,
@@ -15,17 +16,10 @@ const INDICATOR_ROLE = "mute-banners-timer";
 export default class MuteBannersTimerExtension extends Extension {
   enable() {
     const tray = Main.messageTray;
-    const proto = tray?.constructor?.prototype;
-    if (!tray || !proto || typeof tray._updateState !== "function") {
-      logError(
-        new Error("MessageTray suppression API not found"),
-        "[mute-banners-timer] cannot locate MessageTray._updateState/bannerBlocked",
-      );
-      return;
-    }
+    const proto = MessageTray.MessageTray.prototype;
 
     this._controller = new MuteController(tray, () => this._indicator?.sync());
-    this._controller.install();
+    this._controller.install(proto);
 
     this._indicator = new MuteIndicator(this._controller);
     Main.panel.addToStatusArea(INDICATOR_ROLE, this._indicator);

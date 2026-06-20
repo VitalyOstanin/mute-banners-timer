@@ -48,7 +48,7 @@ function makeTray(initialBlocked = false) {
   check("install: no bannerBlocked accessor before install", !("bannerBlocked" in proto));
 
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
   const desc = Object.getOwnPropertyDescriptor(proto, "bannerBlocked");
   check("install: bannerBlocked accessor defined", !!desc && typeof desc.set === "function");
   check("install: shadow fields seeded", tray._muteBannersActive === false && tray._realBannerBlocked === false);
@@ -63,7 +63,7 @@ function makeTray(initialBlocked = false) {
 {
   const tray = makeTray(false);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   tray.bannerBlocked = true; // panel opened the shade
   check("guard idle: writing true sets _bannerBlocked", tray._bannerBlocked === true);
@@ -86,7 +86,7 @@ function makeTray(initialBlocked = false) {
   const c = new MuteController(tray, () => {
     changes++;
   });
-  c.install();
+  c.install(tray.constructor.prototype);
 
   check("engage: inactive before", c.isActive() === false);
   c.engage(5);
@@ -111,7 +111,7 @@ function makeTray(initialBlocked = false) {
 {
   const tray = makeTray(false);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   c.engage(10);
   check("mute+panel: block is set", tray._bannerBlocked === true);
@@ -138,7 +138,7 @@ function makeTray(initialBlocked = false) {
   // The shade was open when the mute engaged: the real value is true.
   const tray = makeTray(true);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
   check("real-true: install remembered real true", tray._realBannerBlocked === true);
 
   c.engage(3);
@@ -156,7 +156,7 @@ function makeTray(initialBlocked = false) {
 {
   const tray = makeTray(false);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   check("remaining: 0 outside a mute", c.remainingSeconds() === 0);
   c.engage(2); // 120 seconds
@@ -173,7 +173,7 @@ function makeTray(initialBlocked = false) {
 {
   const tray = makeTray(false);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   c.engage(1);
   check("re-engage: active after the first", c.isActive() === true);
@@ -198,7 +198,7 @@ function makeBanner() {
   const tray = makeTray(false);
   tray._notificationQueue = [];
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   const n = { acknowledged: true, urgency: 0 };
   tray._notification = n;
@@ -232,7 +232,7 @@ function makeBanner() {
   tray._banner = makeBanner();
   const banner = tray._banner;
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   const n = { acknowledged: true, urgency: 0 };
   c.engage(5, n);
@@ -250,7 +250,7 @@ function makeBanner() {
   const n = { acknowledged: false, urgency: 0 };
   tray._notificationQueue = [n];
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   c.engage(5, n);
   const count = tray._notificationQueue.filter((x) => x === n).length;
@@ -266,7 +266,7 @@ function makeBanner() {
   const normal = { acknowledged: false, urgency: 0 };
   tray._notificationQueue = [normal];
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   const critical = { acknowledged: true, urgency: 2 };
   c.engage(5, critical);
@@ -281,7 +281,7 @@ function makeBanner() {
   const tray = makeTray(false);
   tray._notificationQueue = [];
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   c.engage(5);
   check("requeue/none: queue stays empty", tray._notificationQueue.length === 0);
@@ -295,7 +295,7 @@ function makeBanner() {
 {
   const tray = makeTray(false);
   const c = new MuteController(tray, () => {});
-  c.install();
+  c.install(tray.constructor.prototype);
 
   c.engage(15);
   check("uninstall-active: active", c.isActive() === true);
