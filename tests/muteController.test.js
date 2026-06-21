@@ -205,6 +205,8 @@ function makeBanner() {
   tray._banner = makeBanner();
   const banner = tray._banner;
   tray._bannerBin = { remove_all_transitions() {} };
+  tray._resetNotificationLeftTimeout = () => {};
+  tray._notificationFocusGrabber = { ungrabFocus() {} };
   tray._notificationState = 2; // SHOWN
   let hidden = false;
   tray.hide = () => { hidden = true; };
