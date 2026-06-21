@@ -4,7 +4,12 @@
 // A real GLib timer does not fire without a main loop, so every engage is
 // followed by showNow()/uninstall() to remove the source.
 
-import { MuteController, PRESETS } from "../lib/muteController.js";
+import {
+  MuteController,
+  PRESETS,
+  presetLabel,
+  formatRemaining,
+} from "../lib/muteController.js";
 
 let failures = 0;
 let total = 0;
@@ -38,6 +43,23 @@ function makeTray(initialBlocked = false) {
     JSON.stringify(PRESETS) === "[1,2,3,5,10,15,20,30,60]",
     JSON.stringify(PRESETS),
   );
+}
+
+// --- presetLabel ---------------------------------------------------------
+
+{
+  check("presetLabel: 30 -> '30 min'", presetLabel(30) === "30 min", presetLabel(30));
+  check("presetLabel: 59 -> '59 min'", presetLabel(59) === "59 min", presetLabel(59));
+  check("presetLabel: 60 -> '1 hour'", presetLabel(60) === "1 hour", presetLabel(60));
+}
+
+// --- formatRemaining -----------------------------------------------------
+
+{
+  check("formatRemaining: 0 -> '0:00'", formatRemaining(0) === "0:00", formatRemaining(0));
+  check("formatRemaining: 5 -> '0:05'", formatRemaining(5) === "0:05", formatRemaining(5));
+  check("formatRemaining: 60 -> '1:00'", formatRemaining(60) === "1:00", formatRemaining(60));
+  check("formatRemaining: 3599 -> '59:59'", formatRemaining(3599) === "59:59", formatRemaining(3599));
 }
 
 // --- install and uninstall the guard -------------------------------------

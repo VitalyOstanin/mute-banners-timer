@@ -64,6 +64,10 @@ ln -s "$(pwd)/mute-banners-timer" \
   ~/.local/share/gnome-shell/extensions/mute-banners-timer@VitalyOstanin
 ```
 
+The install is a symlink to the cloned directory: keep the clone in place. Moving
+or deleting it breaks the link; to relocate, remove the symlink and recreate it
+against the new path.
+
 Restart GNOME Shell (X11: `Alt+F2`, `r`, Enter; Wayland: re-login), then:
 
 ```sh
