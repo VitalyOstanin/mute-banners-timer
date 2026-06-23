@@ -1,2 +1,5 @@
+# Packaged extension archives
+*.zip
+
 docs/superpowers/
 docs/reviews/

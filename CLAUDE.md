@@ -12,6 +12,7 @@ Guidance for AI agents and contributors working on this extension.
 - [Procedure: verify against a GNOME version](#procedure-verify-against-a-gnome-version)
 - [Syntax check](#syntax-check)
 - [Unit tests](#unit-tests)
+- [Packaging](#packaging)
 - [Manual testing](#manual-testing)
 - [Files](#files)
 
@@ -161,6 +162,17 @@ tests/run.sh
 `tests/run.sh` executes every `tests/*.test.js` with `gjs -m` and fails if any
 file exits non-zero. The tests use a fake tray and a small in-file `check()`
 helper, with no Node toolchain and no GNOME platform mocking.
+
+## Packaging
+
+```sh
+gnome-extensions pack --force --extra-source=lib .
+```
+
+`--extra-source=lib` is required: `gnome-extensions pack` bundles only a fixed
+default set and does not recurse into `lib/`, so without it the archive omits the
+imported `lib/*.js` and the installed extension fails to load (see ADR 0013). Any
+new top-level directory holding imported modules must be added the same way.
 
 ## Manual testing
 

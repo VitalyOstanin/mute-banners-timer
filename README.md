@@ -13,6 +13,7 @@ accumulate in GNOME's queue and pop up as a burst when the timer ends.
 - [Installation](#installation)
 - [Development](#development)
 - [Tests](#tests)
+- [Packaging](#packaging)
 - [How it works](#how-it-works)
 - [Limitations](#limitations)
 - [License](#license)
@@ -104,6 +105,20 @@ and no GNOME platform mocking.
 
 Why `gjs` and not a Node test framework (vitest/jest): see
 [docs/ADR/0007](docs/ADR/0007-test-with-gjs.md).
+
+## Packaging
+
+Build the archive for extensions.gnome.org with `lib/` added as an extra source:
+
+```sh
+gnome-extensions pack --force --extra-source=lib .
+```
+
+`gnome-extensions pack` bundles only a fixed set by default (`metadata.json`,
+`extension.js`, `prefs.js`, `stylesheet.css`, `schemas/`, `locale/`) and does not
+recurse into `lib/`. Without `--extra-source=lib` the archive omits the imported
+`lib/*.js` modules and the installed extension fails to load. See
+[docs/ADR/0013](docs/ADR/0013-pack-with-extra-source-lib.md).
 
 ## How it works
 
