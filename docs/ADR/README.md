@@ -13,3 +13,4 @@
 - [0011 — Indicator state colors as fixed Adwaita literals](0011-indicator-colors-as-fixed-literals.md)
 - [0012 — Ship sources verbatim to e.g.o, no comment stripping](0012-ship-sources-verbatim-for-ego.md)
 - [0013 — Pack with `--extra-source=lib` so `lib/` ships to e.g.o](0013-pack-with-extra-source-lib.md)
+- [0014 — Attach the mute control in a `finally`, resilient to a co-installed wrapper](0014-attach-mute-control-in-finally.md)

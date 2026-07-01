@@ -35,8 +35,14 @@ export default class MuteBannersTimerExtension extends Extension {
       "_showNotification",
       (original) =>
         function (...args) {
-          original.apply(this, args);
-          self._addBannerControl(this._banner, this._notification);
+          // finally: a co-installed extension may also wrap _showNotification
+          // and throw in its post-show hook after the banner is built. Still
+          // attach our control; its error keeps propagating to be logged.
+          try {
+            original.apply(this, args);
+          } finally {
+            self._addBannerControl(this._banner, this._notification);
+          }
         },
     );
   }
